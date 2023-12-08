@@ -256,6 +256,14 @@ yun_list = [
     'e', 'ang', 'o', 'ong', 'ei', 'ua', 'uan', 'un', 'i', 'u', 'ie', 've', 'v',
     'an', 'iong', 'iang', 'iu', 'ue', 'uai', 'er', 'en', 'ai', 'ing'
 ]
+
+yun_stable_list = [
+    ['iu'], ['ei'], ['e'], ['uan'], ['ue', 've'], ['un'], ['u'], ['i'], ['uo', 'o'], 
+    ['ie'], ['a'], ['iong', 'ong'], ['ai'], ['en'], ['eng'], ['ang'], ['an'], ['ing', 'uai'], 
+    ['iang', 'uang'], ['ou'], ['ia', 'ua'], ['ao'], ['v', 'ui'], ['in'], ['iao'], ['ian']
+]
+
+
 mapping_dict = {
     "sheng": {
         "b": "b",
@@ -282,7 +290,16 @@ mapping_dict = {
         "ch": "i",
         "sh": "u"
     },
-    "yun": {}
+    "yun": {
+        "a": "a", 
+        "o": "o", 
+        "uo": "o", 
+        "e": "e", 
+        "i": "i", 
+        "u": "u", 
+        "v": "v", 
+        "ui": "v"
+    }
 }
 
 
@@ -312,11 +329,33 @@ def compliance_testing(keys_tuple: tuple):
         return False
     return True
 
+"""
+ 对键盘拼音形式的遍历采用广度优先的搜索算法，并每个节点进行一次拼写判定，并把无用节点删除
+ 
+ 判定条件：
+ 1. 对该键位的拼音拼写遍历不在badkeys中, （且拼写分数高于中值）
+ 2. 按键舒适度评分体系： 左右手分别击键 > 单手不同击键 > 食指相邻击键 > 中指相邻击键 > 
+                        无名指相邻击键 > 小指相邻击键 > 食指跨按键击键 > 中指跨按键击键
+ 3. 适用汉字拼音频率评分： 根据pinyin_freq_list中的对数频率来评估, 分数越接近0， 分值越高，尽量使
+                        频率高的拼音组合落在按键舒适度高的评分内
+                        
+ 
+ 
+ 
+ 
+ 
+
+ 
+ """
 
 def main():
     # result = split_pinyin("ao")
     # print(result)
-    pass
+
+    for key in pinyin_freq_list:
+        split_pinyin_tuple = split_pinyin(key[0])
+        print(split_pinyin_tuple)
+        
 
 
 main()
