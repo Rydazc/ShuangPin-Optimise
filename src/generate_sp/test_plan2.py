@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+
 pinyin_freq_list = [
     ('shi', -0.3236428117968411), ('yi', -0.4097843561088526),
     ('ji', -0.47802880934740943), ('yu', -0.582742618644487),
@@ -247,6 +251,7 @@ pinyin_list = [
     'fou', 'nuan', 'sen', 'ang', 'zhei', 'seng', 'nve', 'miu', 'zhuai', 'cen',
     'pou', 'ei', 'tei', 'dia', 'nou', 'm'
 ]
+
 sheng_list = [
     'b', 'p', 'm', 'f', 'd', 't', 'n', 'l', 'g', 'k', 'h', 'j', 'q', 'x', 'zh',
     'ch', 'sh', 'r', 'z', 'c', 's', 'y', 'w'
@@ -257,11 +262,29 @@ yun_list = [
     'an', 'iong', 'iang', 'iu', 'ue', 'uai', 'er', 'en', 'ai', 'ing'
 ]
 
+"""  stable don`t have 'g', 'er' """
+
 yun_stable_list = [
     ['iu'], ['ei'], ['e'], ['uan'], ['ue', 've'], ['un'], ['u'], ['i'], ['uo', 'o'], 
     ['ie'], ['a'], ['iong', 'ong'], ['ai'], ['en'], ['eng'], ['ang'], ['an'], ['ing', 'uai'], 
     ['iang', 'uang'], ['ou'], ['ia', 'ua'], ['ao'], ['v', 'ui'], ['in'], ['iao'], ['ian']
 ]
+
+
+button_list = [
+    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+    'z', 'x', 'c', 'v', 'b', 'n', 'm'
+]
+
+
+keys_cycle_str = "jfkdlsghrtynmbwpqcxz"
+
+# yun_cycle_list = [
+#     ['iu'], ['ei'], ['uan'], ['ue', 've'], ['un'],
+#     ['ie'], ['iong', 'ong'], ['ai'], ['en'], ['eng'], ['ang'], ['an'], ['ing', 'uai'], 
+#     ['iang', 'uang'], ['ou'], ['ia', 'ua'], ['ao'], ['in'], ['iao'], ['ian']
+# ]
 
 
 mapping_dict = {
@@ -303,9 +326,39 @@ mapping_dict = {
 }
 
 
+key_yun_dict = {
+    "q": [], 
+    "w": [], 
+    "e": ['e'], 
+    "r": [], 
+    "t": [], 
+    "y": [], 
+    "u": ['u'], 
+    "i": ['i'], 
+    "o": ['uo', 'o'], 
+    "p": [], 
+    "a": ['a'], 
+    "s": [], 
+    "d": [], 
+    "f": [], 
+    "g": [], 
+    "h": [], 
+    "j": [], 
+    "k": [], 
+    "l": [], 
+    "z": [], 
+    "x": [], 
+    "c": [], 
+    "v": ['v', 'ui'], 
+    "b": [], 
+    "n": [], 
+    "m": []
+}
+
 # 拼音拆分
 def split_pinyin(pinyin: str) -> tuple:
     sheng2_tuple = ("zh", "ch", "sh")
+
     if pinyin.startswith(sheng2_tuple):
         return (pinyin[:2], pinyin[2:])
     elif pinyin.startswith(tuple(sheng_list)):
@@ -314,48 +367,153 @@ def split_pinyin(pinyin: str) -> tuple:
         return ("", pinyin)
 
 
-# 根据拼音获取对应按键组合
-def get_keys(pinyin: str, mapping_dict: dict) -> tuple:
-    sheng_yun_tuple = split_pinyin(pinyin=pinyin)
-    return (mapping_dict["sheng"][sheng_yun_tuple[0]],
-            mapping_dict["yun"][sheng_yun_tuple[1]])
-
-
-# 合规检测
-def compliance_testing(keys_tuple: tuple):
-    bad_keys = [("q", "z"), ("z", "q"), ("z", "w"), ("w", "z"), ("x", "q"),
-                ("q", "x"), ("x", "w"), ("w", "x")]
-    if keys_tuple in bad_keys:
-        return False
-    return True
 
 """
- 对键盘拼音形式的遍历采用广度优先的搜索算法，并每个节点进行一次拼写判定，并把无用节点删除
- 
- 判定条件：
- 1. 对该键位的拼音拼写遍历不在badkeys中, （且拼写分数高于中值）
- 2. 按键舒适度评分体系： 左右手分别击键 > 单手不同击键 > 食指相邻击键 > 中指相邻击键 > 
-                        无名指相邻击键 > 小指相邻击键 > 食指跨按键击键 > 中指跨按键击键
- 3. 适用汉字拼音频率评分： 根据pinyin_freq_list中的对数频率来评估, 分数越接近0， 分值越高，尽量使
-                        频率高的拼音组合落在按键舒适度高的评分内
-                        
- 
- 
- 
- 
- 
 
- 
+
+plan2 
+基于已给定声母排列的情况
+/*
+通过拼音使用频率，计算得到韵母使用频率的数据
+按照按键使用率从高到地排列韵母数据
+
+*/
+
+
  """
+
+
+
+
+
+def cal_freq_list(freq_list):
+    percent_freq_list = []
+    for _ in freq_list:
+        percent_freq_list.append((math.exp(float(_))))
+    return percent_freq_list
+
+
+# 冒泡排序
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        # 提前退出标志位
+        swapped = False
+        # 从0到n-i-1的范围内进行比较
+        for j in range(0, n-i-1):
+            if arr[j] > arr[j+1]:
+                # 交换
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+                swapped = True
+        # 如果没有发生交换，说明数组已经是有序的
+        if not swapped:
+            break
+    return arr
+
+
+def data_show():
+    freq_num_list = [num[1] for num in pinyin_freq_list]
+    freq_num_list = bubble_sort(freq_num_list)
+    freq_num_list_nolog = cal_freq_list(freq_num_list)
+    freq_num = [_ for _ in range(len(freq_num_list))]
+
+    # print(f'freq num list:{freq_num_list}')
+    # print(f'type freq:{type(freq_num_list)}')
+    # print(f'freq num:{freq_num}')
+    # print(f'type freq num:{type(freq_num)}')
+
+    plt.subplot(1, 2, 1)
+    plt.plot(freq_num, freq_num_list_nolog, label="freq_num_of_orgin", color='r')
+    plt.xlabel('x')
+    plt.ylabel("freq")
+    plt.title("freq orgin")
+    plt.legend()
+    plt.grid(True) 
+
+
+    plt.subplot(1, 2, 2)
+    plt.plot(freq_num, freq_num_list, label="freq_num_of_log", color='r')
+    plt.xlabel('x')
+    plt.ylabel("freq")
+    plt.title("freq log")
+    plt.legend()
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+
+
 
 def main():
     # result = split_pinyin("ao")
     # print(result)
 
+    yun_freq_dic = {}
+
     for key in pinyin_freq_list:
         split_pinyin_tuple = split_pinyin(key[0])
-        print(split_pinyin_tuple)
+        yun = split_pinyin_tuple[1]
+        if yun_freq_dic.get(yun):
+            yun_freq_dic[yun] += math.exp(float(key[1]))
+        else:
+            yun_freq_dic[yun] = math.exp(float(key[1]))
+        # print(split_pinyin_tuple)
+    print(yun_freq_dic)
+    print(f"len of yun_freq_dict:{len(yun_freq_dic)}")
+
+    yun_stable_freq_list = [[_, 0] for _ in yun_stable_list]
+
+    for yun_pin in yun_freq_dic.keys():
+        for stable_tuple in yun_stable_freq_list:
+            if yun_pin in stable_tuple[0]:
+                stable_tuple[1] += yun_freq_dic.get(yun_pin) 
+
+    # print(yun_stable_freq_list)
+    yun_stable_freq_list = sorted(yun_stable_freq_list, key=lambda x: x[1], reverse=True)
+    
+
+    print(yun_stable_freq_list)
+    print(f"len of yun_freq_dict:{len(yun_stable_freq_list)}")
+    print(f"yun stable list 0 :{yun_stable_list[0]}")
+
+    """for loop wash the a e i o u v yun in 'yun_stable_freq_list' """
+
+    for key_str in keys_cycle_str:
+        if key_yun_dict.get(key_str) == []:
+            pass 
+        else:
+            yun_stable_freq_list.remove(key_yun_dict[key_str])
+
+    for key_str in keys_cycle_str:
+        if key_yun_dict.get(key_str) == []:
+            key_yun_dict[key_str] = yun_stable_freq_list[0][0]
+            yun_stable_freq_list.pop(0)
+
+        # print(yun_stable_freq_list)
+        # print(key_yun_dict)
+
+    print(key_yun_dict)
+
+    
+
         
 
 
-main()
+
+
+
+if __name__ == '__main__':
+    pass 
+    main()
+    # sum_num = 0
+    # freq_list = cal_freq_list(pinyin_freq_list)
+    # print(freq_list)
+    # for freq in freq_list:
+    #     sum_num += freq[1]
+    # print(sum_num)
+    # data_show()
+
+
+
+        
